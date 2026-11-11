@@ -79,6 +79,30 @@
   .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
   footer { color: var(--muted); font-size: 12px; text-align: center; line-height: 1.5; padding: 4px 8px; }
+
+  .pct { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .pct summary {
+    list-style: none; cursor: pointer; padding: 16px 18px; font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pct summary::-webkit-details-marker { display: none; }
+  .pct summary::after {
+    content: ""; width: 8px; height: 8px; margin-right: 4px;
+    border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg); transition: transform .2s;
+  }
+  .pct[open] summary::after { transform: rotate(-135deg); }
+  .pct summary small { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .rows { padding: 0 14px 14px; display: grid; gap: 6px; }
+  .row {
+    display: grid; grid-template-columns: 44px 1fr 72px; align-items: center; gap: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  .row .p { color: var(--muted); font-size: 13px; font-weight: 600; text-align: right; }
+  .row .bar { height: 26px; border-radius: 8px; background: #1f2226; overflow: hidden; }
+  .row .bar i { display: block; height: 100%; background: var(--accent); opacity: .85; border-radius: 8px; }
+  .row .kg { font-size: 16px; font-weight: 700; text-align: right; }
+  .row .kg small { color: var(--muted); font-weight: 500; font-size: 12px; margin-left: 2px; }
 </style>
 </head>
 <body>
@@ -124,6 +148,11 @@
     </div>
   </div>
 
+  <details class="pct" id="pctBox">
+    <summary><span>% of 1RM<small>load chart</small></span></summary>
+    <div class="rows" id="pctRows"></div>
+  </details>
+
   <footer>Epley formula using reps + RIR as reps to failure.<br>Most accurate when reps + RIR ≤ 10.</footer>
 </main>
 
@@ -146,14 +175,31 @@
     calc();
   }
 
+  const fmt = (kg) => (Math.round(kg * 2) / 2).toLocaleString(undefined, { maximumFractionDigits: 1 });
+
+  const PCTS = [100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50];
+  $('pctRows').innerHTML = PCTS.map(p =>
+    `<div class="row"><span class="p">${p}%</span><span class="bar"><i style="width:${p}%"></i></span><span class="kg" data-p="${p}">–</span></div>`
+  ).join('');
+  function renderPct(est) {
+    document.querySelectorAll('#pctRows .kg').forEach(el => {
+      el.innerHTML = est ? `${fmt(est * el.dataset.p / 100)}<small>kg</small>` : '–';
+    });
+  }
+
+  const pctBox = $('pctBox');
+  try { pctBox.open = localStorage.getItem('1rm-pct-open') === '1'; } catch (e) {}
+  pctBox.addEventListener('toggle', () => { try { localStorage.setItem('1rm-pct-open', pctBox.open ? '1' : '0'); } catch (e) {} });
+
   function calc() {
     const w = parseFloat(load.value), r = parseInt(reps.value, 10);
     note.className = 'note';
-    if (!(w > 0) || !(r >= 1)) { out.textContent = '–'; note.innerHTML = 'Enter load and reps'; return; }
+    if (!(w > 0) || !(r >= 1)) { out.textContent = '–'; note.innerHTML = 'Enter load and reps'; renderPct(null); return; }
 
     const total = r + rir;                       // reps to failure
     const est = total === 1 ? w : w * (1 + total / 30);
-    out.textContent = (Math.round(est * 2) / 2).toLocaleString(undefined, { maximumFractionDigits: 1 });
+    out.textContent = fmt(est);
+    renderPct(est);
 
     if (total > 12) { note.className = 'note warn'; note.textContent = `${total} reps to failure — estimate is less reliable`; }
     else note.textContent = `${w} kg × ${r}${rir ? ` @ ${rir} RIR` : ' to failure'} ≈ ${total}RM`;
