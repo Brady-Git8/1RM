@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1RM</title>
+<meta name="theme-color" content="#0e0f11">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="1RM">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --card: #17191c;
+    --line: #26292e;
+    --text: #f2f3f5;
+    --muted: #8b9099;
+    --accent: #ff5a36;
+    --accent-ink: #fff;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    min-height: 100dvh;
+    padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 24px);
+    display: flex; justify-content: center;
+  }
+  main { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; }
+
+  header { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  header span { color: var(--muted); font-size: 13px; }
+
+  .result {
+    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+    padding: 26px 20px 20px; text-align: center;
+  }
+  .result .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; }
+  .result .value {
+    font-size: 68px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; margin: 8px 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .result .value small { font-size: 24px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+  .result .note { color: var(--muted); font-size: 13px; min-height: 18px; }
+  .result .note.warn { color: #f5b041; }
+
+  .field {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 14px 14px 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .field label { font-size: 15px; font-weight: 600; }
+  .field label small { display: block; color: var(--muted); font-weight: 400; font-size: 12px; margin-top: 2px; }
+
+  .stepper { display: flex; align-items: center; gap: 6px; }
+  .stepper button {
+    width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line);
+    background: #1f2226; color: var(--text); font-size: 22px; line-height: 1; cursor: pointer;
+  }
+  .stepper button:active { background: #2a2e33; }
+  .stepper input {
+    width: 76px; height: 40px; text-align: center; font-size: 20px; font-weight: 700;
+    background: transparent; border: none; color: var(--text); font-variant-numeric: tabular-nums;
+    font-family: inherit; outline: none; -moz-appearance: textfield;
+  }
+  .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .rir { flex-direction: column; align-items: stretch; padding: 14px; }
+  .rir label { padding-left: 4px; }
+  .seg { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 10px; }
+  .seg button {
+    height: 44px; border-radius: 12px; border: 1px solid var(--line); background: #1f2226;
+    color: var(--text); font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+  footer { color: var(--muted); font-size: 12px; text-align: center; line-height: 1.5; padding: 4px 8px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>1RM</h1>
+    <span>Estimated one-rep max</span>
+  </header>
+
+  <section class="result" aria-live="polite">
+    <div class="label">Estimated 1RM</div>
+    <div class="value"><span id="out">–</span><small>kg</small></div>
+    <div class="note" id="note">&nbsp;</div>
+  </section>
+
+  <div class="field">
+    <label for="load">Load<small>kg</small></label>
+    <div class="stepper">
+      <button type="button" data-target="load" data-step="-2.5" aria-label="Decrease load">−</button>
+      <input id="load" type="number" inputmode="decimal" min="0" step="0.5" value="100">
+      <button type="button" data-target="load" data-step="2.5" aria-label="Increase load">+</button>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="reps">Reps<small>performed</small></label>
+    <div class="stepper">
+      <button type="button" data-target="reps" data-step="-1" aria-label="Decrease reps">−</button>
+      <input id="reps" type="number" inputmode="numeric" min="1" max="30" step="1" value="5">
+      <button type="button" data-target="reps" data-step="1" aria-label="Increase reps">+</button>
+    </div>
+  </div>
+
+  <div class="field rir">
+    <label>Reps in reserve<small>RIR — how many more you could have done</small></label>
+    <div class="seg" id="rir" role="group" aria-label="Reps in reserve">
+      <button type="button" data-v="0">0</button>
+      <button type="button" data-v="1">1</button>
+      <button type="button" data-v="2" aria-pressed="true">2</button>
+      <button type="button" data-v="3">3</button>
+      <button type="button" data-v="4">4</button>
+      <button type="button" data-v="5">5</button>
+    </div>
+  </div>
+
+  <footer>Epley formula using reps + RIR as reps to failure.<br>Most accurate when reps + RIR ≤ 10.</footer>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const load = $('load'), reps = $('reps'), out = $('out'), note = $('note');
+  let rir = 2;
+
+  try {
+    const s = JSON.parse(localStorage.getItem('1rm') || '{}');
+    if (s.load != null) load.value = s.load;
+    if (s.reps != null) reps.value = s.reps;
+    if (s.rir != null) rir = s.rir;
+  } catch (e) {}
+
+  function setRir(v) {
+    rir = v;
+    document.querySelectorAll('#rir button').forEach(b =>
+      b.setAttribute('aria-pressed', String(+b.dataset.v === v)));
+    calc();
+  }
+
+  function calc() {
+    const w = parseFloat(load.value), r = parseInt(reps.value, 10);
+    note.className = 'note';
+    if (!(w > 0) || !(r >= 1)) { out.textContent = '–'; note.innerHTML = 'Enter load and reps'; return; }
+
+    const total = r + rir;                       // reps to failure
+    const est = total === 1 ? w : w * (1 + total / 30);
+    out.textContent = (Math.round(est * 2) / 2).toLocaleString(undefined, { maximumFractionDigits: 1 });
+
+    if (total > 12) { note.className = 'note warn'; note.textContent = `${total} reps to failure — estimate is less reliable`; }
+    else note.textContent = `${w} kg × ${r}${rir ? ` @ ${rir} RIR` : ' to failure'} ≈ ${total}RM`;
+
+    try { localStorage.setItem('1rm', JSON.stringify({ load: load.value, reps: reps.value, rir })); } catch (e) {}
+  }
+
+  document.querySelectorAll('.stepper button').forEach(b => b.addEventListener('click', () => {
+    const input = $(b.dataset.target);
+    const min = parseFloat(input.min) || 0;
+    const v = Math.max(min, (parseFloat(input.value) || 0) + parseFloat(b.dataset.step));
+    input.value = +v.toFixed(2);
+    calc();
+  }));
+  document.querySelectorAll('#rir button').forEach(b => b.addEventListener('click', () => setRir(+b.dataset.v)));
+  [load, reps].forEach(i => i.addEventListener('input', calc));
+  load.addEventListener('focus', () => load.select());
+  reps.addEventListener('focus', () => reps.select());
+
+  setRir(rir);
+
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
