@@ -17,6 +17,7 @@
     --bg: #0e0f11;
     --card: #17191c;
     --line: #26292e;
+    --chip: #1f2226;
     --text: #f2f3f5;
     --muted: #8b9099;
     --accent: #ff5a36;
@@ -31,14 +32,29 @@
     display: flex; justify-content: center;
   }
   main { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; }
+  button { font-family: inherit; }
 
   header { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px; }
   h1 { font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
   header span { color: var(--muted); font-size: 13px; }
 
+  /* Exercise */
+  .ex { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 4px 6px 4px 18px; display: flex; align-items: center; }
+  .ex input {
+    flex: 1; min-width: 0; height: 48px; background: transparent; border: none; outline: none;
+    color: var(--text); font-family: inherit; font-size: 18px; font-weight: 700;
+  }
+  .ex input::placeholder { color: var(--muted); font-weight: 500; }
+  .ex button {
+    width: 36px; height: 36px; border: none; border-radius: 10px; background: transparent;
+    color: var(--muted); font-size: 20px; cursor: pointer; visibility: hidden;
+  }
+  .ex.has button { visibility: visible; }
+
+  /* Result */
   .result {
     background: var(--card); border: 1px solid var(--line); border-radius: 20px;
-    padding: 26px 20px 20px; text-align: center;
+    padding: 22px 20px 16px; text-align: center;
   }
   .result .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; }
   .result .value {
@@ -48,7 +64,13 @@
   .result .value small { font-size: 24px; font-weight: 600; color: var(--muted); margin-left: 4px; }
   .result .note { color: var(--muted); font-size: 13px; min-height: 18px; }
   .result .note.warn { color: #f5b041; }
+  .save {
+    margin-top: 14px; width: 100%; height: 46px; border-radius: 12px; border: none;
+    background: var(--accent); color: var(--accent-ink); font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .save:disabled { background: var(--chip); color: var(--muted); cursor: default; }
 
+  /* Inputs */
   .field {
     background: var(--card); border: 1px solid var(--line); border-radius: 16px;
     padding: 14px 14px 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -59,7 +81,7 @@
   .stepper { display: flex; align-items: center; gap: 6px; }
   .stepper button {
     width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line);
-    background: #1f2226; color: var(--text); font-size: 22px; line-height: 1; cursor: pointer;
+    background: var(--chip); color: var(--text); font-size: 22px; line-height: 1; cursor: pointer;
   }
   .stepper button:active { background: #2a2e33; }
   .stepper input {
@@ -73,36 +95,72 @@
   .rir label { padding-left: 4px; }
   .seg { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 10px; }
   .seg button {
-    height: 44px; border-radius: 12px; border: 1px solid var(--line); background: #1f2226;
-    color: var(--text); font-size: 17px; font-weight: 600; font-family: inherit; cursor: pointer;
+    height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--chip);
+    color: var(--text); font-size: 17px; font-weight: 600; cursor: pointer;
   }
   .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
-  footer { color: var(--muted); font-size: 12px; text-align: center; line-height: 1.5; padding: 4px 8px; }
-
-  .pct { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
-  .pct summary {
+  /* Collapsible panels */
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .panel summary {
     list-style: none; cursor: pointer; padding: 16px 18px; font-size: 15px; font-weight: 600;
     display: flex; align-items: center; justify-content: space-between;
   }
-  .pct summary::-webkit-details-marker { display: none; }
-  .pct summary::after {
+  .panel summary::-webkit-details-marker { display: none; }
+  .panel summary::after {
     content: ""; width: 8px; height: 8px; margin-right: 4px;
     border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
     transform: rotate(45deg); transition: transform .2s;
   }
-  .pct[open] summary::after { transform: rotate(-135deg); }
-  .pct summary small { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .panel[open] summary::after { transform: rotate(-135deg); }
+  .panel summary small { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
+
+  /* % chart */
   .rows { padding: 0 14px 14px; display: grid; gap: 6px; }
   .row {
     display: grid; grid-template-columns: 44px 1fr 72px; align-items: center; gap: 10px;
     font-variant-numeric: tabular-nums;
   }
   .row .p { color: var(--muted); font-size: 13px; font-weight: 600; text-align: right; }
-  .row .bar { height: 26px; border-radius: 8px; background: #1f2226; overflow: hidden; }
+  .row .bar { height: 26px; border-radius: 8px; background: var(--chip); overflow: hidden; }
   .row .bar i { display: block; height: 100%; background: var(--accent); opacity: .85; border-radius: 8px; }
   .row .kg { font-size: 16px; font-weight: 700; text-align: right; }
   .row .kg small { color: var(--muted); font-weight: 500; font-size: 12px; margin-left: 2px; }
+
+  /* My lifts */
+  .lifts { padding: 0 10px 10px; display: grid; gap: 6px; }
+  .lift { display: flex; align-items: stretch; gap: 6px; }
+  .lift .open {
+    flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--chip);
+    color: var(--text); text-align: left; cursor: pointer;
+  }
+  .lift.active .open { border-color: var(--accent); }
+  .lift .name { font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lift .meta { display: block; color: var(--muted); font-size: 12px; font-weight: 400; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lift .open > span:first-child { min-width: 0; overflow: hidden; }
+  .lift .rm { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .lift .rm small { color: var(--muted); font-size: 12px; font-weight: 500; margin-left: 2px; }
+  .lift .del {
+    width: 40px; border-radius: 12px; border: 1px solid var(--line); background: transparent;
+    color: var(--muted); font-size: 18px; cursor: pointer;
+  }
+  .empty { color: var(--muted); font-size: 13px; text-align: center; padding: 6px 8px 12px; line-height: 1.5; }
+  .backup { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px 10px 6px; }
+  .backup button {
+    height: 40px; border-radius: 12px; border: 1px solid var(--line); background: transparent;
+    color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .hint { color: var(--muted); font-size: 11.5px; text-align: center; padding: 0 12px 14px; line-height: 1.45; }
+
+  footer { color: var(--muted); font-size: 12px; text-align: center; line-height: 1.5; padding: 4px 8px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 24px); transform: translate(-50%, 20px);
+    background: #2a2e33; color: var(--text); padding: 10px 16px; border-radius: 12px; font-size: 14px;
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100% - 32px); text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
 </style>
 </head>
 <body>
@@ -112,10 +170,18 @@
     <span>Estimated one-rep max</span>
   </header>
 
+  <div class="ex" id="exBox">
+    <input id="ex" list="exList" placeholder="Exercise (e.g. Bench Press)" autocomplete="off"
+           autocapitalize="words" spellcheck="false" enterkeyhint="done" maxlength="40" aria-label="Exercise">
+    <datalist id="exList"></datalist>
+    <button type="button" id="exClear" aria-label="Clear exercise">×</button>
+  </div>
+
   <section class="result" aria-live="polite">
     <div class="label">Estimated 1RM</div>
     <div class="value"><span id="out">–</span><small>kg</small></div>
     <div class="note" id="note">&nbsp;</div>
+    <button type="button" class="save" id="save" disabled>Name the exercise to save</button>
   </section>
 
   <div class="field">
@@ -148,35 +214,61 @@
     </div>
   </div>
 
-  <details class="pct" id="pctBox">
+  <details class="panel" id="pctBox">
     <summary><span>% of 1RM<small>load chart</small></span></summary>
     <div class="rows" id="pctRows"></div>
+  </details>
+
+  <details class="panel" id="liftBox">
+    <summary><span>My lifts<small id="liftCount"></small></span></summary>
+    <div class="lifts" id="lifts"></div>
+    <div class="backup">
+      <button type="button" id="backupBtn">Back up</button>
+      <button type="button" id="restoreBtn">Restore</button>
+    </div>
+    <div class="hint">Back up saves a file — pick <b>Google Drive</b> (Android) or <b>Save to Files → Google Drive</b> (iPhone). Restore lets you open that file from Drive.</div>
+    <input type="file" id="restoreFile" accept=".txt,.json,text/plain,application/json" hidden>
   </details>
 
   <footer>Epley formula using reps + RIR as reps to failure.<br>Most accurate when reps + RIR ≤ 10.</footer>
 </main>
 
+<div class="toast" id="toast" role="status"></div>
+
 <script>
   const $ = (id) => document.getElementById(id);
   const load = $('load'), reps = $('reps'), out = $('out'), note = $('note');
-  let rir = 2;
+  const ex = $('ex'), saveBtn = $('save');
+  let rir = 2, current = null;   // current = { load, reps, rir, e1rm } or null
 
-  try {
-    const s = JSON.parse(localStorage.getItem('1rm') || '{}');
-    if (s.load != null) load.value = s.load;
-    if (s.reps != null) reps.value = s.reps;
-    if (s.rir != null) rir = s.rir;
-  } catch (e) {}
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  let lifts = store.get('1rm-lifts', {});   // key (lowercase name) -> { name, load, reps, rir, e1rm, date }
 
-  function setRir(v) {
-    rir = v;
-    document.querySelectorAll('#rir button').forEach(b =>
-      b.setAttribute('aria-pressed', String(+b.dataset.v === v)));
-    calc();
+  // "bench  press" -> "Bench Press", "t-bar row" -> "T-Bar Row"; short all-caps words (RDL, DB) stay as typed
+  const tidy = (s) => s.trim().replace(/\s+/g, ' ').replace(/[^\s-]+/g, w =>
+    (w.length > 1 && w.length <= 4 && /[A-Z]/.test(w) && w === w.toUpperCase()) ? w : w[0].toUpperCase() + w.slice(1).toLowerCase());
+  const keyOf = (name) => tidy(name).toLowerCase();
+  const fmt = (kg) => (Math.round(kg * 2) / 2).toLocaleString(undefined, { maximumFractionDigits: 1 });
+  const fmtDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-  const fmt = (kg) => (Math.round(kg * 2) / 2).toLocaleString(undefined, { maximumFractionDigits: 1 });
+  // ---- restore last session ----
+  const s = store.get('1rm', {});
+  if (s.load != null) load.value = s.load;
+  if (s.reps != null) reps.value = s.reps;
+  if (s.rir != null) rir = s.rir;
+  if (s.ex) ex.value = s.ex;
 
+  // ---- % chart ----
   const PCTS = [100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50];
   $('pctRows').innerHTML = PCTS.map(p =>
     `<div class="row"><span class="p">${p}%</span><span class="bar"><i style="width:${p}%"></i></span><span class="kg" data-p="${p}">–</span></div>`
@@ -187,26 +279,144 @@
     });
   }
 
-  const pctBox = $('pctBox');
-  try { pctBox.open = localStorage.getItem('1rm-pct-open') === '1'; } catch (e) {}
-  pctBox.addEventListener('toggle', () => { try { localStorage.setItem('1rm-pct-open', pctBox.open ? '1' : '0'); } catch (e) {} });
+  // remember open/closed panels
+  ['pctBox', 'liftBox'].forEach(id => {
+    const d = $(id);
+    d.open = store.get('1rm-open-' + id, id === 'liftBox');
+    d.addEventListener('toggle', () => store.set('1rm-open-' + id, d.open));
+  });
+
+  // ---- calculator ----
+  function setRir(v) {
+    rir = v;
+    document.querySelectorAll('#rir button').forEach(b =>
+      b.setAttribute('aria-pressed', String(+b.dataset.v === v)));
+    calc();
+  }
 
   function calc() {
     const w = parseFloat(load.value), r = parseInt(reps.value, 10);
     note.className = 'note';
-    if (!(w > 0) || !(r >= 1)) { out.textContent = '–'; note.innerHTML = 'Enter load and reps'; renderPct(null); return; }
-
-    const total = r + rir;                       // reps to failure
-    const est = total === 1 ? w : w * (1 + total / 30);
-    out.textContent = fmt(est);
-    renderPct(est);
-
-    if (total > 12) { note.className = 'note warn'; note.textContent = `${total} reps to failure — estimate is less reliable`; }
-    else note.textContent = `${w} kg × ${r}${rir ? ` @ ${rir} RIR` : ' to failure'} ≈ ${total}RM`;
-
-    try { localStorage.setItem('1rm', JSON.stringify({ load: load.value, reps: reps.value, rir })); } catch (e) {}
+    if (!(w > 0) || !(r >= 1)) {
+      current = null; out.textContent = '–'; note.textContent = 'Enter load and reps'; renderPct(null);
+    } else {
+      const total = r + rir;                       // reps to failure
+      const est = total === 1 ? w : w * (1 + total / 30);
+      current = { load: w, reps: r, rir, e1rm: Math.round(est * 2) / 2 };
+      out.textContent = fmt(est);
+      renderPct(est);
+      if (total > 12) { note.className = 'note warn'; note.textContent = `${total} reps to failure — estimate is less reliable`; }
+      else note.textContent = `${w} kg × ${r}${rir ? ` @ ${rir} RIR` : ' to failure'} ≈ ${total}RM`;
+    }
+    store.set('1rm', { load: load.value, reps: reps.value, rir, ex: ex.value });
+    updateSave();
   }
 
+  // ---- save ----
+  function updateSave() {
+    const name = ex.value.trim();
+    $('exBox').classList.toggle('has', !!name);
+    if (!name) { saveBtn.disabled = true; saveBtn.textContent = 'Name the exercise to save'; }
+    else if (!current) { saveBtn.disabled = true; saveBtn.textContent = 'Enter load and reps'; }
+    else {
+      const rec = lifts[keyOf(name)];
+      const same = rec && rec.load === current.load && rec.reps === current.reps && rec.rir === current.rir;
+      saveBtn.disabled = !!same;
+      saveBtn.textContent = same ? 'Saved ✓' : rec ? `Update ${tidy(name)} (was ${fmt(rec.e1rm)} kg)` : `Save ${tidy(name)}`;
+    }
+    document.querySelectorAll('.lift').forEach(el => el.classList.toggle('active', !!name && el.dataset.key === keyOf(name)));
+  }
+
+  saveBtn.addEventListener('click', () => {
+    if (!current || !ex.value.trim()) return;
+    const name = tidy(ex.value);
+    ex.value = name;
+    lifts[keyOf(name)] = { name, ...current, date: new Date().toISOString() };
+    store.set('1rm-lifts', lifts);
+    renderLifts(); calc();
+    toast(`${name} saved — ${fmt(current.e1rm)} kg`);
+  });
+
+  // ---- my lifts ----
+  function renderLifts() {
+    const list = Object.entries(lifts).sort((a, b) => a[1].name.localeCompare(b[1].name));
+    $('liftCount').textContent = list.length ? String(list.length) : '';
+    $('exList').innerHTML = list.map(([, l]) => `<option value="${esc(l.name)}">`).join('');
+    $('lifts').innerHTML = list.length ? list.map(([k, l]) => `
+      <div class="lift" data-key="${esc(k)}">
+        <button type="button" class="open" data-key="${esc(k)}">
+          <span style="min-width:0"><span class="name">${esc(l.name)}</span>
+            <span class="meta">${l.load} kg × ${l.reps}${l.rir ? ` @ ${l.rir} RIR` : ''} · ${fmtDate(l.date)}</span></span>
+          <span class="rm">${fmt(l.e1rm)}<small>kg</small></span>
+        </button>
+        <button type="button" class="del" data-key="${esc(k)}" aria-label="Delete ${esc(l.name)}">×</button>
+      </div>`).join('')
+      : `<div class="empty">No saved lifts yet.<br>Type an exercise at the top, then tap Save.</div>`;
+    updateSave();
+  }
+
+  $('lifts').addEventListener('click', (e) => {
+    const openBtn = e.target.closest('.open'), delBtn = e.target.closest('.del');
+    if (openBtn) {
+      const l = lifts[openBtn.dataset.key]; if (!l) return;
+      ex.value = l.name; load.value = l.load; reps.value = l.reps;
+      setRir(l.rir);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (delBtn) {
+      const l = lifts[delBtn.dataset.key]; if (!l) return;
+      if (!confirm(`Delete ${l.name} (${fmt(l.e1rm)} kg)?`)) return;
+      delete lifts[delBtn.dataset.key];
+      store.set('1rm-lifts', lifts);
+      renderLifts();
+      toast(`${l.name} deleted`);
+    }
+  });
+
+  // ---- backup / restore ----
+  $('backupBtn').addEventListener('click', async () => {
+    const all = Object.values(lifts);
+    if (!all.length) { toast('Nothing to back up yet'); return; }
+    const text = JSON.stringify({ app: '1RM', version: 1, exported: new Date().toISOString(), lifts: all }, null, 2);
+    const name = `1RM-backup-${new Date().toISOString().slice(0, 10)}.txt`;
+    const file = new File([text], name, { type: 'text/plain' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: '1RM backup' }); return; }
+      catch (e) { if (e.name === 'AbortError') return; }
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('Backup file downloaded');
+  });
+
+  $('restoreBtn').addEventListener('click', () => $('restoreFile').click());
+  $('restoreFile').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      const incoming = Array.isArray(data.lifts) ? data.lifts : [];
+      let added = 0;
+      for (const l of incoming) {
+        if (!l || !l.name || !(l.e1rm > 0)) continue;
+        const name = tidy(String(l.name)), k = name.toLowerCase();
+        const mine = lifts[k];
+        if (!mine || new Date(l.date) > new Date(mine.date)) {
+          lifts[k] = { name, load: +l.load, reps: +l.reps, rir: +l.rir || 0, e1rm: +l.e1rm, date: l.date || new Date().toISOString() };
+          added++;
+        }
+      }
+      if (!incoming.length) throw new Error('empty');
+      store.set('1rm-lifts', lifts);
+      renderLifts();
+      toast(added ? `Restored ${added} lift${added > 1 ? 's' : ''}` : 'Already up to date');
+    } catch (err) {
+      toast("That file isn't a 1RM backup");
+    }
+  });
+
+  // ---- wiring ----
   document.querySelectorAll('.stepper button').forEach(b => b.addEventListener('click', () => {
     const input = $(b.dataset.target);
     const min = parseFloat(input.min) || 0;
@@ -219,7 +429,18 @@
   load.addEventListener('focus', () => load.select());
   reps.addEventListener('focus', () => reps.select());
 
+  ex.addEventListener('input', () => {
+    // picking a saved exercise from the suggestions loads it
+    const l = lifts[keyOf(ex.value || ' ')];
+    if (l && ex.value === l.name) { load.value = l.load; reps.value = l.reps; setRir(l.rir); }
+    else calc();
+  });
+  ex.addEventListener('change', () => { if (ex.value.trim()) ex.value = tidy(ex.value); calc(); });
+  ex.addEventListener('keydown', (e) => { if (e.key === 'Enter') ex.blur(); });
+  $('exClear').addEventListener('click', () => { ex.value = ''; calc(); ex.focus(); });
+
   setRir(rir);
+  renderLifts();
 
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
